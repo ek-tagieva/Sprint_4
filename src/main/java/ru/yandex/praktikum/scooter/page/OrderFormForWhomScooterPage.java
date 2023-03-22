@@ -1,12 +1,8 @@
-package FinalProject4Sprint;
-
-
+package ru.yandex.praktikum.scooter.page;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-
-
-public class OrderFormForWhomScooterPage { // Page Object страницы Для кого самокат
+public class OrderFormForWhomScooterPage {
     private WebDriver driver;
     private final By nameField = By.xpath(".//input[@placeholder = '* Имя']");
     private final By familyNameField = By.xpath(".//input[@placeholder = '* Фамилия']");
@@ -21,8 +17,6 @@ public class OrderFormForWhomScooterPage { // Page Object страницы Дл�
 
     }
 
-
-    // Заполняем поля формы
     public void enterValueInSomeField(String username, String family, String address, String metroStation, String telephone) {
         driver.findElement(nameField).sendKeys(username);
         driver.findElement(familyNameField).sendKeys(family);
@@ -30,15 +24,17 @@ public class OrderFormForWhomScooterPage { // Page Object страницы Дл�
         driver.findElement(metroStationField).sendKeys(metroStation);
         driver.findElement(subwayDropdownList).click();
         driver.findElement(telephoneField).sendKeys(telephone);
+        driver.findElement(nextButton).click();
     }
 
-    // Нажимаем на кнопку Далее
     public void clickNextButton(){
 
         driver.findElement(nextButton).click();
     }
-
-
+    public void fieldAndNext(String username, String family, String address, String metroStation, String telephone){
+        enterValueInSomeField(username, family, address, metroStation, telephone);
+        clickNextButton();
+    }
 }
 
 

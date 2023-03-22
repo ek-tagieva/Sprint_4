@@ -1,57 +1,48 @@
-import FinalProject4Sprint.MainScooterPage;
+import ru.yandex.praktikum.scooter.page.MainScooterPage;
 import org.junit.Test;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import java.util.concurrent.TimeUnit;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import io.github.bonigarcia.wdm.WebDriverManager;
-
 import static org.junit.Assert.assertEquals;
+import org.junit.After;
 
 
-public class DropDownListOfImportantQuestions { // Проверка выпадающего списка раздела "Вопросы о важном"
-        private WebDriver driver;
+public class DropDownListOfImportantQuestions {
+    private WebDriver driver;
 
     @Test
-    public void clickArrowOpenTextChrome(){ // Когда нажимаешь на стрелочку, открывается соответствующий текст в Chrome
+    public void clickArrowOpenTextChrome(){
         driver = new ChromeDriver();
         driver.get("https://qa-scooter.praktikum-services.ru/");
-        // Делаем на весь экран
-        driver.manage().window().maximize();
-        // Ждем когда прогрузится страница
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        driver.findElement(By.xpath(".//button[@class='App_CookieButton__3cvqF']")).click();
         MainScooterPage objMainScooterPage = new MainScooterPage(driver);
+        objMainScooterPage.generalAction();
         objMainScooterPage.clickArrowButton();
         objMainScooterPage.getArrowButton();
         String expected = "Сутки — 400 рублей. Оплата курьеру — наличными или картой.";
         String actual =  objMainScooterPage.getArrowButton();
         assertEquals(expected, actual);
-        driver.quit();
-
 
     }
 
     @Test
-    public void clickArrowOpenTextFirefox(){ // Когда нажимаешь на стрелочку, открывается соответствующий текст в Firefox
+    public void clickArrowOpenTextFirefox(){
         WebDriverManager.firefoxdriver().setup();
         driver = new FirefoxDriver();
         driver.get("https://qa-scooter.praktikum-services.ru/");
-        // Делаем на весь экран
-        driver.manage().window().maximize();
-        // Ждем когда прогрузится страница
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        driver.findElement(By.xpath(".//button[@class='App_CookieButton__3cvqF']")).click();
         MainScooterPage objMainScooterPage = new MainScooterPage(driver);
+        objMainScooterPage.generalAction();
         objMainScooterPage.clickArrowButton();
         objMainScooterPage.getArrowButton();
         String expected = "Сутки — 400 рублей. Оплата курьеру — наличными или картой.";
         String actual =  objMainScooterPage.getArrowButton();
         assertEquals(expected, actual);
-        driver.quit();
+
     }
 
-
+    @After
+    public void teardown() {
+        driver.quit();
+    }
 
 }

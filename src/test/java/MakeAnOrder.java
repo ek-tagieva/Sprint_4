@@ -1,3 +1,4 @@
+import org.hamcrest.MatcherAssert;
 import org.junit.After;
 import ru.yandex.praktikum.scooter.page.MainScooterPage;
 import ru.yandex.praktikum.scooter.page.OrderFormForWhomScooterPage;
@@ -9,39 +10,45 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.junit.Test;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import ru.yandex.praktikum.scooter.page.PopupWindowsPage;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertEquals;
 
 
 
 @RunWith(Parameterized.class)
-public class OrderOneFormTest {
+public class MakeAnOrder {
     private WebDriver driver;
     private final String username;
     private final String family;
     private final String address;
     private final String metroStation;
     private final String telephone;
+    private final String deliveryDate;
+    private final String comment;
     private final boolean result;
 
-    public OrderOneFormTest(String username, String family, String address, String metroStation, String telephone, boolean result) {
+    public MakeAnOrder(String username, String family, String address, String metroStation, String telephone, String deliveryDate, String comment, boolean result) {
         this.username = username;
         this.family = family;
         this.address = address;
         this.metroStation = metroStation;
         this.telephone = telephone;
+        this.deliveryDate = deliveryDate;
+        this.comment = comment;
         this.result = result;
     }
 
     @Parameterized.Parameters
-    public static Object[][] FieldPersonalData() {
+    public static Object[][] FillingFieldPersonalData() {
         return new Object[][]{
-                {"Кати", "Иванова", "Камова 7", "Преображенская площадь", "88988988998", true},
-                {"Мари", "Петрова", "Ленина 15", "Бульвар Рокосовского", "89895677656", true},
+                {"Кати", "Иванова", "Камова 7", "Преображенская площадь", "88988988998", "25.03.2023", "Привезите лето", true},
+                {"Мари", "Петрова", "Ленина 15", "Бульвар Рокосовского", "89895677656", "30.03.2023", "обещали солнце", true},
         };
     }
 
     @Test
-    public void personalDateOneFormChrome() {
+    public void fillingPersonalDateChrome() {
         WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
         driver.get("https://qa-scooter.praktikum-services.ru/");
@@ -55,11 +62,17 @@ public class OrderOneFormTest {
         String expected = "Про аренду";
         String actual = objOrderFormRentalScooterPage.getTitleField();
         assertEquals(result, actual.equals(expected));
+        objOrderFormRentalScooterPage.fieldAndRent(deliveryDate, comment);
+        PopupWindowsPage objPopupWindowsPage = new PopupWindowsPage(driver);
+        objPopupWindowsPage.clickButtonPopupYes();
+        String expectedOrderIsProcessed = "Заказ оформлен";
+        String actualOrderIsProcessed  = objPopupWindowsPage.getTextOrderCompleted();
+        MatcherAssert.assertThat(actualOrderIsProcessed, startsWith(expectedOrderIsProcessed));
 
     }
 
     @Test
-    public void personalDateOneFormFirefox() {
+    public void fillingPersonalDateFirefox() {
         WebDriverManager.firefoxdriver().setup();
         driver = new FirefoxDriver();
         driver.get("https://qa-scooter.praktikum-services.ru/");
@@ -73,6 +86,12 @@ public class OrderOneFormTest {
         String expected = "Про аренду";
         String actual = objOrderFormRentalScooterPage.getTitleField();
         assertEquals(result, actual.equals(expected));
+        objOrderFormRentalScooterPage.fieldAndRent(deliveryDate, comment);
+        PopupWindowsPage objPopupWindowsPage = new PopupWindowsPage(driver);
+        objPopupWindowsPage.clickButtonPopupYes();
+        String expectedOrderIsProcessed = "Заказ оформлен";
+        String actualOrderIsProcessed  = objPopupWindowsPage.getTextOrderCompleted();
+        MatcherAssert.assertThat(actualOrderIsProcessed, startsWith(expectedOrderIsProcessed));
 
     }
 
@@ -82,11 +101,4 @@ public class OrderOneFormTest {
     }
 
 }
-
-
-
-
-
-
-
 

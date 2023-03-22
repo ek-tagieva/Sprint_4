@@ -1,23 +1,18 @@
-import FinalProject4Sprint.MainScooterPage;
-import FinalProject4Sprint.OrderFormForWhomScooterPage;
-import FinalProject4Sprint.OrderFormRentalScooterPage;
-import FinalProject4Sprint.PopupCheckoutQuestion;
+import org.hamcrest.MatcherAssert;
+import org.junit.After;
+import ru.yandex.praktikum.scooter.page.*;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.junit.Test;
 import org.openqa.selenium.firefox.FirefoxDriver;
-
-import static org.junit.Assert.assertEquals;
-
-import java.util.concurrent.TimeUnit;
-
+import static org.hamcrest.CoreMatchers.startsWith;
 
 @RunWith(Parameterized.class)
-public class OrderTwoFormTest {
+public class  OrderTwoFormTest {
+    private WebDriver driver;
     private final String deliveryDate;
     private final String comment;
     private final boolean result;
@@ -25,74 +20,66 @@ public class OrderTwoFormTest {
     public OrderTwoFormTest(String deliveryDate, String comment, boolean result) {
         this.deliveryDate = deliveryDate;
         this.comment = comment;
-       this.result = result;
+        this.result = result;
     }
     @Parameterized.Parameters
-    public static Object[][] FieldPersonalDataTwo() { // Каждая строка с данными — это тестовый набор для одного запуска теста: firstNumber, secondNumber, expected. Например, первый раз тест будет запущен со значениями 1, 9, 10, а второй — со значениями 1, 0, 1. Количество запусков теста равно количеству строк с данными.
+    public static Object[][] FieldPersonalDataTwo() {
         return new Object[][]{
                 {"25.03.2023", "Привезите лето", true},
                 {"30.03.2023", "обещали солнце", true},
         };
     }
 
-        @Test
-        public void personalDateTestTwoChrome(){
-            WebDriverManager.chromedriver().setup();
-            WebDriver driver = new ChromeDriver();
-            driver.get("https://qa-scooter.praktikum-services.ru/");
-            driver.manage().window().maximize();
-            driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-            driver.findElement(By.xpath(".//button[@class='App_CookieButton__3cvqF']")).click();
-            MainScooterPage objMainScooterPage = new MainScooterPage(driver);
-            objMainScooterPage.clickTopOrderButton();
-            OrderFormForWhomScooterPage objOrderFormForWhomScooterPage = new OrderFormForWhomScooterPage(driver);
-            driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-            objOrderFormForWhomScooterPage.enterValueInSomeField("Мари", "Кошкина", "Ленина 15", "Преображенская площадь", "88988988998");
-            objOrderFormForWhomScooterPage.clickNextButton();
-            driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-            OrderFormRentalScooterPage objOrderFormRentalScooterPage = new  OrderFormRentalScooterPage(driver);
-            objOrderFormRentalScooterPage.enterValueRentField(deliveryDate, comment);
-            objOrderFormRentalScooterPage.clickOrderRentButton();
-            driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-            PopupCheckoutQuestion objPopupCheckoutQuestion = new  PopupCheckoutQuestion(driver);
-            objPopupCheckoutQuestion.clickButtonPopupYes();
-            driver.quit();
-        }
-
-        @Test
-        public void PersonalDateTestTwoFirefox(){
-            WebDriverManager.firefoxdriver().setup();
-            FirefoxDriver driver = new FirefoxDriver();
-            driver.get("https://qa-scooter.praktikum-services.ru/");
-            driver.manage().window().maximize();
-            driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-            driver.findElement(By.xpath(".//button[@class='App_CookieButton__3cvqF']")).click();
-            MainScooterPage objMainScooterPage = new MainScooterPage(driver);
-            objMainScooterPage.clickTopOrderButton();
-            OrderFormForWhomScooterPage objOrderFormForWhomScooterPage = new OrderFormForWhomScooterPage(driver);
-            driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-            objOrderFormForWhomScooterPage.enterValueInSomeField("Мари", "Кошкина", "Ленина 15", "Преображенская площадь", "88988988998");
-            objOrderFormForWhomScooterPage.clickNextButton();
-            driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-            OrderFormRentalScooterPage objOrderFormRentalScooterPage = new  OrderFormRentalScooterPage(driver);
-            objOrderFormRentalScooterPage.enterValueRentField(deliveryDate, comment);
-            objOrderFormRentalScooterPage.clickOrderRentButton();
-            driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-            PopupCheckoutQuestion objPopupCheckoutQuestion = new  PopupCheckoutQuestion(driver);
-            objPopupCheckoutQuestion.clickButtonPopupYes();
-            driver.quit();
-
-
-        }
-
-
-
-
-
-
-
+    @Test
+    public void personalDateTwoFormChrome(){
+        WebDriverManager.chromedriver().setup();
+        driver = new ChromeDriver();
+        driver.get("https://qa-scooter.praktikum-services.ru/");
+        MainScooterPage objMainScooterPage = new MainScooterPage(driver);
+        objMainScooterPage.generalAction();
+        objMainScooterPage.clickTopOrderButton();
+        OrderFormForWhomScooterPage objOrderFormForWhomScooterPage = new OrderFormForWhomScooterPage(driver);
+        objOrderFormForWhomScooterPage.fieldAndNext("Екатерина", "Тагиева", "Ленина 15", "Преображенская площадь", "88988988998");
+        OrderFormRentalScooterPage objOrderFormRentalScooterPage = new  OrderFormRentalScooterPage(driver);
+        objOrderFormRentalScooterPage.fieldAndRent(deliveryDate, comment);
+        PopupWindowsPage objPopupWindowsPage = new PopupWindowsPage(driver);
+        objPopupWindowsPage.clickButtonPopupYes();
+        objPopupWindowsPage.getTextOrderCompleted();
+        String expectedOrderIsProcessed = "Заказ оформлен";
+        String result  = objPopupWindowsPage.getTextOrderCompleted();
+        MatcherAssert.assertThat(result, startsWith(expectedOrderIsProcessed));
 
     }
+
+    @Test
+    public void personalDateTwoFormFirefox(){
+        WebDriverManager.firefoxdriver().setup();
+        driver = new FirefoxDriver();
+        driver.get("https://qa-scooter.praktikum-services.ru/");
+        MainScooterPage objMainScooterPage = new MainScooterPage(driver);
+        objMainScooterPage.generalAction();
+        objMainScooterPage.clickTopOrderButton();
+        OrderFormForWhomScooterPage objOrderFormForWhomScooterPage = new OrderFormForWhomScooterPage(driver);
+        objOrderFormForWhomScooterPage.fieldAndNext("Екатерина", "Тагиева", "Ленина 15", "Преображенская площадь", "88988988998");
+        OrderFormRentalScooterPage objOrderFormRentalScooterPage = new  OrderFormRentalScooterPage(driver);
+        objOrderFormRentalScooterPage.fieldAndRent(deliveryDate, comment);
+        PopupWindowsPage objPopupWindowsPage = new PopupWindowsPage(driver);
+        objPopupWindowsPage.clickButtonPopupYes();
+        objPopupWindowsPage.getTextOrderCompleted();
+        String expectedOrderIsProcessed = "Заказ оформлен";
+        String result  = objPopupWindowsPage.getTextOrderCompleted();
+        MatcherAssert.assertThat(result, startsWith(expectedOrderIsProcessed));
+    }
+
+    @After
+    public void teardown() {
+        driver.quit();
+    }
+
+}
+
+
+
 
 
 
